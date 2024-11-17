@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM python:3.13-slim-bookworm
 RUN groupadd -r fpocket && useradd --no-log-init -r -g fpocket fpocket
 RUN apt update -y && apt install -y gcc g++ make libnetcdf-dev && rm -rf /var/lib/apt/lists/*
 
@@ -18,5 +18,11 @@ WORKDIR /opt/fpocket
 
 RUN make && make install && make clean
 USER fpocket
+
+WORKDIR /home/fpocket
+
+RUN pip install fastapi[standard]
+COPY main.py main.py
+
 WORKDIR /tmp
-CMD ["fpocket"]
+ENTRYPOINT ["/home/fpocket/.local/bin/fastapi", "run","/home/fpocket/main.py"]
